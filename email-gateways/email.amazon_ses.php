@@ -16,37 +16,37 @@ Class Amazon_SESGateway extends EmailGateway{
 
 	public function __construct(){
 		parent::__construct();
-		$this->setSenderEmailAddress(Symphony::Configuration()->get('from_address', 'amazon_ses') ? Symphony::Configuration()->get('from_address', 'amazon_ses') : 'noreply@' . HTTP_HOST);
-		$this->setSenderName(Symphony::Configuration()->get('from_name', 'amazon_ses') ? Symphony::Configuration()->get('from_name', 'amazon_ses') : 'Symphony');
-		$this->setAwsKey(Symphony::Configuration()->get('aws_key', 'amazon_ses'));
-		$this->setAwsSecretKey(Symphony::Configuration()->get('aws_secret_key', 'amazon_ses'));
-		$this->setFallback(Symphony::Configuration()->get('fallback', 'amazon_ses'));
-		$this->setReturnPath(Symphony::Configuration()->get('return_path', 'amazon_ses'));
-		if(Symphony::Configuration()->get('aws_key', 'amazon_ses') && Symphony::Configuration()->get('aws_secret_key', 'amazon_ses')){
-			$this->_amazon_ses = new AmazonSES(Symphony::Configuration()->get('aws_key', 'amazon_ses'), Symphony::Configuration()->get('aws_secret_key', 'amazon_ses'));
+		$this->setSenderEmailAddress(Symphony::Configuration()->get('from_address', 'email_amazon_ses') ? Symphony::Configuration()->get('from_address', 'email_amazon_ses') : 'noreply@' . HTTP_HOST);
+		$this->setSenderName(Symphony::Configuration()->get('from_name', 'email_amazon_ses') ? Symphony::Configuration()->get('from_name', 'email_amazon_ses') : 'Symphony');
+		$this->setAwsKey(Symphony::Configuration()->get('aws_key', 'email_amazon_ses'));
+		$this->setAwsSecretKey(Symphony::Configuration()->get('aws_secret_key', 'email_amazon_ses'));
+		$this->setFallback(Symphony::Configuration()->get('fallback', 'email_amazon_ses'));
+		$this->setReturnPath(Symphony::Configuration()->get('return_path', 'email_amazon_ses'));
+		if(Symphony::Configuration()->get('aws_key', 'email_amazon_ses') && Symphony::Configuration()->get('aws_secret_key', 'email_amazon_ses')){
+			$this->_amazon_ses = new AmazonSES(Symphony::Configuration()->get('aws_key', 'email_amazon_ses'), Symphony::Configuration()->get('aws_secret_key', 'email_amazon_ses'));
 		}
 	}
 
 	public function about(){
 		return array(
-			'name' => 'Amazon SES',
+			'name' => 'Amazon SES'
 		);
 	}
 
 	public function getPreferencesPane(){
 		$group = new XMLElement('fieldset');
 		$group->setAttribute('class', 'settings pickable');
-		$group->setAttribute('id', 'amazon_ses');
+		$group->setAttribute('id', 'email_amazon_ses');
 		$group->appendChild(new XMLElement('legend', __('Amazon SES')));
 		
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'group');
 		$label = Widget::Label(__('AWS Key'));
-		$label->appendChild(Widget::Input('settings[amazon_ses][aws_key]', Symphony::Configuration()->get('aws_key', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][aws_key]', Symphony::Configuration()->get('aws_key', 'email_amazon_ses')));
 		$div->appendChild($label);
 
 		$label = Widget::Label(__('AWS Secret Key'));
-		$label->appendChild(Widget::Input('settings[amazon_ses][aws_secret_key]', Symphony::Configuration()->get('aws_secret_key', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][aws_secret_key]', Symphony::Configuration()->get('aws_secret_key', 'email_amazon_ses')));
 		$div->appendChild($label);
 		$group->appendChild($div);
 
@@ -55,22 +55,22 @@ Class Amazon_SESGateway extends EmailGateway{
 		$div = new XMLElement('div');
 		$div->setAttribute('class', 'group');
 		$label = Widget::Label(__('From Name'));
-		$label->appendChild(Widget::Input('settings[amazon_ses][from_name]', Symphony::Configuration()->get('from_name', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][from_name]', Symphony::Configuration()->get('from_name', 'email_amazon_ses')));
 		$div->appendChild($label);
 
 		$label = Widget::Label(__('From Email Address'));
-		$label->appendChild(Widget::Input('settings[amazon_ses][from_address]', Symphony::Configuration()->get('from_address', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][from_address]', Symphony::Configuration()->get('from_address', 'email_amazon_ses')));
 		$div->appendChild($label);
 		$group->appendChild($div);
 
-		if(Symphony::Configuration()->get('aws_key', 'amazon_ses') && Symphony::Configuration()->get('aws_secret_key', 'amazon_ses')){
+		if(Symphony::Configuration()->get('aws_key', 'email_amazon_ses') && Symphony::Configuration()->get('aws_secret_key', 'email_amazon_ses')){
 			if(is_null($this->_amazon_ses)){
-				$this->_amazon_ses = new AmazonSES(Symphony::Configuration()->get('aws_key', 'amazon_ses'), Symphony::Configuration()->get('aws_secret_key', 'amazon_ses'));
+				$this->_amazon_ses = new AmazonSES(Symphony::Configuration()->get('aws_key', 'email_amazon_ses'), Symphony::Configuration()->get('aws_secret_key', 'email_amazon_ses'));
 			}
 			$list = $this->_amazon_ses->list_verified_email_addresses();
 			$in_array = false;
 			foreach($list->body->ListVerifiedEmailAddressesResult->VerifiedEmailAddresses->member as $email){
-				if($email == Symphony::Configuration()->get('from_address', 'amazon_ses')){
+				if($email == Symphony::Configuration()->get('from_address', 'email_amazon_ses')){
 					$in_array = true;
 				}
 			}
@@ -79,7 +79,7 @@ Class Amazon_SESGateway extends EmailGateway{
 			}
 			else{
 				$group->appendChild(new XMLElement('p', 'This email address is not yet confirmed. An email is sent with instructions on how to confirm.', array('class' => 'help')));
-				$this->_amazon_ses->verify_email_address(Symphony::Configuration()->get('from_address', 'amazon_ses'));
+				$this->_amazon_ses->verify_email_address(Symphony::Configuration()->get('from_address', 'email_amazon_ses'));
 			}
 			var_dump($this->_amazon_ses->get_send_quota()->body->GetSendQuotaResult);
 		}
@@ -88,24 +88,24 @@ Class Amazon_SESGateway extends EmailGateway{
 		$div->setAttribute('class', 'group');
 		$label = Widget::Label(__('Reply To Name'));
 		$label->appendChild(new XMLElement('i', __('Optional')));
-		$label->appendChild(Widget::Input('settings[amazon_ses][reply_to_name]', Symphony::Configuration()->get('reply_to_name', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][reply_to_name]', Symphony::Configuration()->get('reply_to_name', 'email_amazon_ses')));
 		$div->appendChild($label);
 
 		$label = Widget::Label(__('Reply To Email Address'));
 		$label->appendChild(new XMLElement('i', __('Optional')));
-		$label->appendChild(Widget::Input('settings[amazon_ses][reply_to_email]', Symphony::Configuration()->get('reply_to_email', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][reply_to_email]', Symphony::Configuration()->get('reply_to_email', 'email_amazon_ses')));
 		$div->appendChild($label);
 		$group->appendChild($div);
 
 		$label = Widget::Label(__('Return Path'));
 		$label->appendChild(new XMLElement('i', __('Optional')));
-		$label->appendChild(Widget::Input('settings[amazon_ses][return_path]', Symphony::Configuration()->get('return_path', 'amazon_ses')));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][return_path]', Symphony::Configuration()->get('return_path', 'email_amazon_ses')));
 		$group->appendChild($label);
 		$group->appendChild(new XMLElement('p', 'This address will be used to send bounces to.', array('class' => 'help')));
 
 		$email_gateway_manager = new EmailGatewayManager();
 		$gateways = $email_gateway_manager->listAll();
-		unset($gateways['amazon_ses']);
+		unset($gateways['email_amazon_ses']);
 		$gateways = array_merge(array('none'=>array('name'=>'None','handle'=>'none')), $gateways);
 
 		$label = Widget::Label(__('Fallback Gateway'));
@@ -113,13 +113,13 @@ Class Amazon_SESGateway extends EmailGateway{
 		// Get gateway names
 		ksort($gateways);
 
-		$fallback = Symphony::Configuration()->get('fallback', 'amazon_ses');
+		$fallback = Symphony::Configuration()->get('fallback', 'email_amazon_ses');
 
 		$options = array();
 		foreach($gateways as $handle => $details) {
 			$options[] = array($handle, ($fallback == null) && $handle == 'none', $details['name']);
 		}
-		$select = Widget::Select('settings[amazon_ses][fallback]', $options);
+		$select = Widget::Select('settings[email_amazon_ses][fallback]', $options);
 		$label->appendChild($select);
 		$group->appendChild($label);
 		$group->appendChild(new XMLElement('p', 'When the sending limit has been reached, Symphony will use this gateway instead of giving up. If no gateway is selected, the email will not be sent.', array('class' => 'help')));
