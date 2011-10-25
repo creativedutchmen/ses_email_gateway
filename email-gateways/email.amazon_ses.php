@@ -59,7 +59,7 @@ Class Amazon_SESGateway extends EmailGateway{
 		$div->appendChild($label);
 
 		$label = Widget::Label(__('From Email Address'));
-		$label->appendChild(Widget::Input('settings[email_amazon_ses][from_address]', $this->_sender_address));
+		$label->appendChild(Widget::Input('settings[email_amazon_ses][from_address]', $this->_sender_email_address));
 		$div->appendChild($label);
 		$group->appendChild($div);
 
@@ -70,7 +70,7 @@ Class Amazon_SESGateway extends EmailGateway{
 			$list = $this->_amazon_ses->list_verified_email_addresses();
 			$in_array = false;
 			foreach($list->body->ListVerifiedEmailAddressesResult->VerifiedEmailAddresses->member as $email){
-				if($email == $this->_sender_address){
+				if($email == $this->_sender_email_address){
 					$in_array = true;
 				}
 			}
@@ -79,7 +79,7 @@ Class Amazon_SESGateway extends EmailGateway{
 			}
 			else{
 				$group->appendChild(new XMLElement('p', 'This email address is not yet confirmed. An email is sent with instructions on how to confirm.', array('class' => 'help')));
-				$this->_amazon_ses->verify_email_address($this->_sender_address);
+				$this->_amazon_ses->verify_email_address($this->_sender_email_address);
 			}
 			var_dump($this->_amazon_ses->get_send_quota()->body->GetSendQuotaResult);
 		}
