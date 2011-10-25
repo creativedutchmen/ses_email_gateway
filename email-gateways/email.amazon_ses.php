@@ -119,6 +119,9 @@ Class Amazon_SESGateway extends EmailGateway{
 		$this->validate();
 	
 		try{
+			if(is_null($this->_amazon_ses)){
+				$this->_amazon_ses = new AmazonSES($this->_aws_key, $this->_aws_secret_key);
+			}
 			// Encode the subject
 			$this->_subject	 = EmailHelper::qEncode($this->_subject);
 
