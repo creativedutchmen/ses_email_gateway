@@ -36,7 +36,7 @@ Class Amazon_SESGateway extends EmailGateway{
 	public function getPreferencesPane(){
 		$group = new XMLElement('fieldset');
 		$group->setAttribute('class', 'settings pickable');
-		$group->setAttribute('id', 'email_amazon_ses');
+		$group->setAttribute('id', 'amazon_ses');
 		$group->appendChild(new XMLElement('legend', __('Amazon SES')));
 		
 		$div = new XMLElement('div');
