@@ -1,6 +1,6 @@
 <?php
 
-class extension_random_hash_field extends Extension{
+class extension_ses_email_gateway extends Extension{
 
 	public function about(){
 			return array(
