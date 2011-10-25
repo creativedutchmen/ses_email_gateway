@@ -177,24 +177,13 @@ Class Amazon_SESGateway extends EmailGateway{
 
 			$message = null;
 			foreach($this->_header_fields as $header=>$value){
-				$message .= $header . ': ' . $value . "\r\n";
+				$message .= $header . ': ' . EmailHelper::fold($value) . "\r\n";
 			}
 
 			$message .= "\r\n";
 
-			// Because the message can contain \n as a newline, replace all \r\n with \n and explode on \n.
-			// The send() function will use the proper line ending (\r\n).
-			$data = str_replace("\r\n", "\n", $this->_body);
-			$data_arr = explode("\n", $data);
-			foreach($data_arr as $line){
-				// Escape line if first character is a period (dot). http://tools.ietf.org/html/rfc2821#section-4.5.2
-				if(strpos($line, '.') === 0){
-					$line = '.' . $line;
-				}
-				$message .= $line;
-			}
-			//var_dump($message);
-			//die();
+			$message .= $this->_body;
+
 			$result = $this->_amazon_ses->send_raw_email(array('Data'=>base64_encode($message)));
 			if(!$result->isOK()){
 				throw new EmailGatewayException($result->body->Error->Code->to_string() . ' - ' . $result->body->Error->Message->to_string());
